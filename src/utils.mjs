@@ -21,9 +21,8 @@ async function extractFrames(filename, fps = 30) {
     const prefix = 'frame'
     await exec(`ffmpeg -i "${filename}" -vf fps=${fps} -pix_fmt rgb24 ${targetFolder}/${prefix}-%07d.png`);
     const list = await readdir(targetFolder);
-    return list
-        .filter(f => f.startsWith(prefix))
-        .map(f_1 => `./frames/${f_1}`);
+
+    return list.filter(f => f.startsWith(prefix)).map(f_1 => `./frames/${f_1}`);
 }
 
 function namer(layer = 'layer', sample = 'Spl') {
