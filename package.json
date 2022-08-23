@@ -1,0 +1,23 @@
+{
+  "name": "im-poorman-longexposure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/merge.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msproesser/im-poorman-longexposure.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/msproesser/im-poorman-longexposure/issues"
+  },
+  "homepage": "https://github.com/msproesser/im-poorman-longexposure#readme",
+  "dependencies": {
+    "gpu.js": "^2.15.2",
+    "jimp": "^0.16.1"
+  }
+}
