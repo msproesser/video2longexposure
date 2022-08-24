@@ -36,7 +36,7 @@ function pixelAvgPostProcessor(vector, count) {
     return v
 }
 
-export default function pureJimpMethod(reducer) {
+export default function pureJimpStrategy(reducer) {
     return async function(fileList) {
         let sum;
         for (const frame of fileList) {
