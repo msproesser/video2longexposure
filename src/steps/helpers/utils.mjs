@@ -1,5 +1,5 @@
 import { promisify } from 'util'; 
-import { readdir as _readdir } from 'fs';
+import { rmSync, mkdirSync, readdir as _readdir } from 'fs';
 import { exec as _exec} from 'child_process'
 const exec = promisify(_exec);
 const readdir = promisify(_readdir)
@@ -12,8 +12,12 @@ function buildSplits(list, chunkSize = 2) {
     return Promise.resolve(chunkList)
 }
 
-function cleanAll() {
-    return exec('rm ./frames/*; rm ./darkroom/*; echo "done"')
+function cleanAll(folderList = []) {
+    folderList.forEach(f => {
+        rmSync(`./${f}`, { recursive: true, force: true })
+        mkdirSync(`./${f}`)
+    })
+    return Promise.resolve()
 }
 
 async function extractFrames(filename, fps = 30) {

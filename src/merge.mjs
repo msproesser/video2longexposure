@@ -1,12 +1,12 @@
 import { hexPixel, hexVectorToFile } from './steps/helpers/jimp-helpers.mjs';
 import jimpGpuStrategy from './steps/merge-frames/jimp-gpu-strategy.mjs';
 import pureJimpStrategy, { incrementalReducer, lightenReducer } from './steps/merge-frames/pure-jimp-strategy.mjs';
-import {cleanAll, extractFrames} from './utils.mjs'
+import {cleanAll, extractFrames} from './steps/helpers/utils.mjs'
 
 
 
 const [videoFile, fps] = process.argv.slice(2);
-cleanAll()
+cleanAll(['frames', 'darkroom'])
 .then(() => extractFrames(videoFile, fps))
 .then(jimpGpuStrategy)
 .then(hexPixel)
