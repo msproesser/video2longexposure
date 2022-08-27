@@ -1,55 +1,45 @@
 import jimp from 'jimp'
-import { buildArray, scanToArray, vectorLoop } from '../helpers/jimp-helpers.mjs'
+import { saveImage } from '../helpers/jimp-helpers.mjs'
 
 export function incrementalReducer(sum, next) {
-    
-    vectorLoop(sum, (x, y) => {
-        const [r,g,b,a] = sum[x][y]
-        const [nr,ng,nb,na] = next[x][y]
-        sum[x][y] = [r+nr, g+ng, b+nb, a+na]
-    })
+    for (let index = 0; index < sum.length; index++) {
+        sum[index] = sum[index] + next[index];
+    }
     return sum
 }
 incrementalReducer.postProcess = pixelAvgPostProcessor
 
 export function lightenReducer(sum, next) {
-    vectorLoop(sum, (x, y) => {
-        const [r,g,b,a] = sum[x][y]
-        const [nr,ng,nb,na] = next[x][y]
-        sum[x][y] = [
-            r < nr ? nr : r, 
-            g < ng ? ng : g,  
-            b < nb ? nb : b,  
-            a < na ? na : a, 
-        ]
-    })
+    for (let index = 0; index < sum.length; index++) {
+        sum[index] = sum[index] < next[index] ? next[index] : sum[index];
+    }
     return sum
 }
 
 function pixelAvgPostProcessor(vector, count) {
-    const v = buildArray(vector.length, vector[0].length)
     const avg = color => Math.round(color/count)
-    vectorLoop(vector, (x, y, pixel) => {
-        const [r,g,b,a] = pixel
-        v[x][y] = [avg(r), avg(g), avg(b), avg(a)]
-    })
-    return v
+    for (let index = 0; index < vector.length; index++) {
+        vector[index] = avg(vector[index]);
+        
+    }
+    return vector
 }
 
 export default function pureJimpStrategy(reducer) {
     return async function(fileList) {
-        let sum;
+        let sum, sample;
         for (const frame of fileList) {
             
             console.log(frame)
-            const imgArr = await jimp.read(frame).then(scanToArray);
+            sample = await jimp.read(frame)
             if (sum) {
-                sum = reducer(sum, imgArr);
+                sum = reducer(sum, [...sample.bitmap.data]);
             } else {
-                sum = imgArr;
+                sum = [...sample.bitmap.data];
             }
         }
-        return reducer.postProcess ? reducer.postProcess(sum, fileList.length) : sum
+        const avg = reducer.postProcess ? reducer.postProcess(sum, fileList.length) : sum
+        return saveImage(avg, sample.bitmap.width, sample.bitmap.height, 'pure-final.png')
     }
 }
 

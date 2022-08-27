@@ -18,6 +18,7 @@
   "homepage": "https://github.com/msproesser/im-poorman-longexposure#readme",
   "dependencies": {
     "gpu.js": "^2.15.2",
-    "jimp": "^0.16.1"
+    "jimp": "^0.16.1",
+    "rxjs": "^7.5.6"
   }
 }

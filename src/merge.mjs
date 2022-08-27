@@ -1,17 +1,15 @@
-import { hexPixel, hexVectorToFile } from './steps/helpers/jimp-helpers.mjs';
-import jimpGpuStrategy from './steps/merge-frames/jimp-gpu-strategy.mjs';
+
 import pureJimpStrategy, { incrementalReducer, lightenReducer } from './steps/merge-frames/pure-jimp-strategy.mjs';
-import {cleanAll, extractFrames} from './steps/helpers/utils.mjs'
+import {cleanAll, extractFrames, readdir} from './steps/helpers/utils.mjs'
+import batchedJimpGpuStrategy from './steps/merge-frames/gpu-bitmap-arg-strategy.mjs';
 
 
-
+console.time('all')
 const [videoFile, fps] = process.argv.slice(2);
+
 cleanAll(['frames', 'darkroom'])
 .then(() => extractFrames(videoFile, fps))
-.then(jimpGpuStrategy)
-.then(hexPixel)
-.then(hexVectorToFile('./final.png'))
-.then(console.log)
-.then(() => process.exit(0))
+.then(batchedJimpGpuStrategy)
+.then((x) => x.subscribe(() => console.timeEnd('all')))
 
 
