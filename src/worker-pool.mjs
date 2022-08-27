@@ -19,9 +19,9 @@ class WorkerWrap {
     isFree() {
         return this.#free
     }
-    send(message) {
+    send(payload) {
         const id = this.#messageIdCounter++
-        const pack = { message, headers: {id} }
+        const pack = { payload, headers: {id} }
         this.#free = false;
         this.#worker.postMessage(pack)
         return new Promise((res, err) => {
@@ -33,8 +33,10 @@ class WorkerWrap {
 export default class WorkerPool {
     #workers = []
     #messageQueue = []
-
+    #quantity = 4
     constructor(quantity = 4) {
+        console.log('pool size of', quantity)
+        this.#quantity = quantity
         for (let i = 0; i < quantity; i++) {
             this.#workers.push(new WorkerWrap(i))
         }
@@ -56,5 +58,9 @@ export default class WorkerPool {
         return new Promise((callback, err) => {
             this.#messageQueue.push({ data, callback, err });
         })
+    }
+
+    poolSize() {
+        return this.#quantity
     }
 }

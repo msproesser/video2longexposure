@@ -9,7 +9,7 @@ function buildSplits(list, chunkSize = 2) {
     for (let i = 0; i < list.length; i += chunkSize) {
         chunkList.push(list.slice(i, i + chunkSize));
     }
-    return Promise.resolve(chunkList)
+    return chunkList
 }
 
 function cleanAll(folderList = []) {
@@ -29,27 +29,4 @@ async function extractFrames(filename, fps = 30) {
     return list.filter(f => f.startsWith(prefix)).map(f_1 => `./frames/${f_1}`);
 }
 
-function namer(layer = 'layer', sample = 'Spl') {
-    function* nameGenerator(prefix) {
-        let counter = 0;
-        while(true) {
-            yield `${prefix}${counter}`
-            counter++
-        }
-    }
-    const layerNamer = nameGenerator(layer)
-    const _gen = {
-        newLayer() {
-            _gen._layer = layerNamer.next().value
-            _gen.sampleNamer = nameGenerator(_gen._layer + `-${sample}`)
-            return _gen._layer
-        },
-        sample() {
-            return _gen.sampleNamer.next().value
-        }
-    }
-    _gen.newLayer()
-    return _gen
-}
-
-export {exec, readdir, buildSplits, cleanAll, namer, extractFrames}
+export {exec, readdir, buildSplits, cleanAll, extractFrames}

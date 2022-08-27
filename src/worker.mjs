@@ -1,17 +1,26 @@
+import Jimp from "jimp";
 import { workerData, parentPort, isMainThread } from "worker_threads";
-import pairMergeStrategy from './sampleMergeStrategies/pair-merge-strategy.mjs'
+import pureJimpStrategy, {incrementalReducer} from "./steps/merge-frames/pure-jimp-strategy.mjs";
 
+console.log('initing worker', workerData)
 // You can do any heavy stuff here, in a synchronous way
 // without blocking the "main thread"
-parentPort.on("message", message => {
+parentPort.on("message", async function(message) {
   if (message === "exit") {
     parentPort.postMessage("sold!");
     parentPort.close();
-  } else {
-      pairMergeStrategy(message.message)
-      .then(result => parentPort.postMessage({ data: result, headers: message.headers }))
-      .catch(console.log)
+    return;
+  } 
+  const payload = message.payload
+  let result = await Jimp.read(payload.pop()).then(sample => [...sample.bitmap.data]);
+  
+  for (const frameFile of payload) {
+    result = await Jimp.read(frameFile)
+    .then(sample  => incrementalReducer(result, [...sample.bitmap.data])
+    )
   }
+  parentPort.postMessage({ data: result, headers: message.headers })
+  
 });
 
 console.log('worker started', workerData)
