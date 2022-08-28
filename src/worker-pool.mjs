@@ -58,7 +58,7 @@ export default class WorkerPool {
                 
                 worker.send(message.data).then(cb => message.callback(cb)).catch(message.err)
             }
-        }, 100)
+        }, 40)
     }
 
     #getFree() {

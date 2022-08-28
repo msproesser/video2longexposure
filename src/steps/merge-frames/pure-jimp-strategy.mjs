@@ -21,8 +21,7 @@ export function lightenReducer(sum, next) {
 function pixelAvgPostProcessor(vector, count) {
     const avg = color => Math.round(color/count)
     for (let index = 0; index < vector.length; index++) {
-        vector[index] = avg(vector[index]);
-        
+        vector[index] = avg(vector[index]);       
     }
     return vector
 }
@@ -45,7 +44,7 @@ export default function pureJimpStrategy(reducer) {
     }
 }
 
-export function jimpWorkerStrategy(size = 6) {
+export function jimpWorkerStrategy(size = 6, name) {
     const workerPool = new WorkerPool(size)
     return async function(fileList) {
 
@@ -60,6 +59,6 @@ export function jimpWorkerStrategy(size = 6) {
         .then(sums => sums.reduce(incrementalReducer))
         .then(sum => pixelAvgPostProcessor(sum, fileList.length))
 
-        return saveImage(result, width, height, 'pure-final.png')
+        return saveImage(result, width, height, name)
     }
 }
