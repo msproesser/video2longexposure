@@ -7,7 +7,6 @@ console.log('initing worker', workerData)
 // without blocking the "main thread"
 parentPort.on("message", async function(message) {
   if (message === "exit") {
-    parentPort.postMessage("sold!");
     parentPort.close();
     return;
   } 

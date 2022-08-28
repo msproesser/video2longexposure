@@ -6,8 +6,9 @@ const [videoFile, fps] = process.argv.slice(2);
 
 cleanAll(['frames', 'darkroom'])
 .then(() => extractFrames(videoFile, fps))
-.then(jimpWorkerStrategy(8))
+.then(jimpWorkerStrategy(4))
 .then()
 .then(() => console.timeEnd('all'))
+.then(() => process.exit(0))
 
 

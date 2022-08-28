@@ -7,14 +7,21 @@ class WorkerWrap {
     #free = true
     constructor(id) {
         this.#worker = new Worker('./src/worker.mjs', { workerData: 'worker-' + id });
-        this.#worker.on("error", code => new Error(`Worker[worker-${id}] error with exit code ${code}`));
-        this.#worker.on("exit", code => console.log(`Worker[worker-${id}] stopped with exit code ${code}`));
+        this.#worker.on("error", code => {
+            this.#free = false
+            new Error(`Worker[worker-${id}] error with exit code ${code}`)
+        });
+        this.#worker.on("exit", code => {
+            this.#free = false
+            console.log(`Worker[worker-${id}] stopped with exit code ${code}`)
+        });
         this.#worker.on('message', result => {
             this.#free = true;
             const feedbackFn = this.#idResultMap.get(result.headers.id)
             feedbackFn && feedbackFn(result.data)
             this.#idResultMap.delete(result.headers.id)
         })
+        
     }
     isFree() {
         return this.#free
@@ -27,6 +34,10 @@ class WorkerWrap {
         return new Promise((res, err) => {
             this.#idResultMap.set(id, data => res(data))
         })
+    }
+    close() {
+        this.#worker.unref()
+        return this.#worker.postMessage('exit')
     }
 }
 
@@ -62,5 +73,9 @@ export default class WorkerPool {
 
     poolSize() {
         return this.#quantity
+    }
+
+    close() {
+        this.#workers.forEach(w => w.close())
     }
 }
