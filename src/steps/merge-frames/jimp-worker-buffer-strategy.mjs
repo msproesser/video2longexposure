@@ -1,9 +1,9 @@
 import Jimp from 'jimp'
 import WorkerPool from '../../worker-pool.mjs';
+import { average } from '../helpers/jimp-helpers.mjs';
 import { buildSplits } from '../helpers/utils.mjs';
 
 function reducer(sum, next) {
-    console.log('inal reduction', {sum, next})
     for (let index = 0; index < next.length; index+=4) {
         const sumColor = sum.readUInt32BE(index)
         const nextColor = next.readUInt32BE(index)
@@ -12,18 +12,7 @@ function reducer(sum, next) {
     return sum
 }
 
-function average(sum, count, scale) {
-    const finalLength = sum.length / scale
-    const result = Buffer.alloc(finalLength)
-    console.log('avg final buffer length'+(finalLength), result.length)
-    for (let index = 0; index < finalLength; index++) {
-        const color = sum.readUInt32BE(index * scale);
-        result.writeUInt8(color/count, index)
-    }
-    return result
-}
-
-export default function jimpWorkerBufferStrategy(filename, workerCount = 4) {
+export default function jimpWorkerBufferStrategy(workerCount = 4) {
     const workerPool = new WorkerPool(workerCount);
     return async function(fileList) {
         let sample = await Jimp.read(fileList[0]);
@@ -35,9 +24,6 @@ export default function jimpWorkerBufferStrategy(filename, workerCount = 4) {
         .then(sum => average(sum, fileList.length, scale))
 
         const [width, height] = [sample.bitmap.width, sample.bitmap.height]
-        return new Promise((res, err) => new Jimp({data: avg, width, height}, (err, img) => {
-            console.log('err is', err); 
-            img.writeAsync(filename).then(res).catch(err);
-        }))
+        return {data: avg, width, height}
     }
 }
