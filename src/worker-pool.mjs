@@ -26,9 +26,9 @@ class WorkerWrap {
     isFree() {
         return this.#free
     }
-    send(payload) {
+    send(payload, headers = {}) {
         const id = this.#messageIdCounter++
-        const pack = { payload, headers: {id} }
+        const pack = { payload, headers: {...headers, id} }
         this.#free = false;
         this.#worker.postMessage(pack)
         return new Promise((res, err) => {
@@ -56,7 +56,7 @@ export default class WorkerPool {
             if (this.#messageQueue.length > 0 && worker) {
                 const message = this.#messageQueue.shift()
                 
-                worker.send(message.data).then(cb => message.callback(cb)).catch(message.err)
+                worker.send(message.data, message.headers).then(cb => message.callback(cb)).catch(message.err)
             }
         }, 40)
     }
@@ -65,9 +65,9 @@ export default class WorkerPool {
         return this.#workers.find(w => w.isFree())
     }
 
-    send(data) {
+    send(data, headers = {}) {
         return new Promise((callback, err) => {
-            this.#messageQueue.push({ data, callback, err });
+            this.#messageQueue.push({ data, headers, callback, err });
         })
     }
 
