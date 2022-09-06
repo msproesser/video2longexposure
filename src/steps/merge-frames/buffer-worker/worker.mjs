@@ -1,6 +1,6 @@
 import Jimp from "jimp";
 import { workerData, parentPort, isMainThread } from "worker_threads";
-import { incrementalReducer } from "./steps/helpers/jimp-helpers.mjs";
+import { incrementalReducer } from "../../helpers/jimp-helpers.mjs";
 
 
 async function sum(payload, scale) {

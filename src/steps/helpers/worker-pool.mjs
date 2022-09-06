@@ -5,8 +5,8 @@ class WorkerWrap {
     #idResultMap = new Map()
     #worker
     #free = true
-    constructor(id) {
-        this.#worker = new Worker('./src/worker.mjs', { workerData: 'worker-' + id });
+    constructor(id, workerPath) {
+        this.#worker = new Worker(workerPath, { workerData: 'worker-' + id });
         this.#worker.on("error", code => {
             this.#free = false
             new Error(`Worker[worker-${id}] error with exit code ${code}`)
@@ -45,11 +45,11 @@ export default class WorkerPool {
     #workers = []
     #messageQueue = []
     #quantity = 4
-    constructor(quantity = 4) {
+    constructor(quantity = 4, workerPath) {
         console.log('pool size of', quantity)
         this.#quantity = quantity
         for (let i = 0; i < quantity; i++) {
-            this.#workers.push(new WorkerWrap(i))
+            this.#workers.push(new WorkerWrap(i, workerPath))
         }
         setInterval(() => {
             const worker = this.#getFree()

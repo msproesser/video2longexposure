@@ -1,7 +1,7 @@
 import Jimp from 'jimp'
-import WorkerPool from '../../worker-pool.mjs';
-import { average } from '../helpers/jimp-helpers.mjs';
-import { buildSplits } from '../helpers/utils.mjs';
+import WorkerPool from '../../helpers/worker-pool.mjs';
+import { average } from '../../helpers/jimp-helpers.mjs';
+import { buildSplits } from '../../helpers/utils.mjs';
 
 function reducer(sum, next) {
     for (let index = 0; index < next.length; index+=4) {
@@ -13,7 +13,7 @@ function reducer(sum, next) {
 }
 
 export default function jimpWorkerBufferStrategy(workerCount = 4) {
-    const workerPool = new WorkerPool(workerCount);
+    const workerPool = new WorkerPool(workerCount, './src/steps/merge-frames/buffer-worker/worker.mjs');
     return async function(fileList) {
         let sample = await Jimp.read(fileList[0]);
         const scale = 4;
