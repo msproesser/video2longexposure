@@ -17,7 +17,6 @@ function imagick() {
     .then(() => extractFrames(videoFile, fps))
     .then(listFrames)
     .then(pairMergeStrrategy(4))
-    .then(result => saveImage({...result, filename}))
     .then(() => console.timeEnd('all'))
     .then(() => process.exit(0))
 }

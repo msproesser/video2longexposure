@@ -1,6 +1,6 @@
 import { promisify } from 'util'; 
 import { rmSync, mkdirSync, readdir as _readdir } from 'fs';
-import { exec as _exec} from 'child_process'
+import { exec as _exec, spawn} from 'child_process'
 const exec = promisify(_exec);
 const readdir = promisify(_readdir)
 
@@ -29,6 +29,23 @@ async function extractFrames(filename, fps = 30) {
     return list.filter(f => f.startsWith(prefix)).map(f_1 => `./frames/${f_1}`);
 }
 
+function extractFrameStream(filename, fps = 30) {
+    return spawn('ffmpeg', [
+        '-i', filename,
+        '-vf', 'fps='+fps,
+        '-pix_fmt', 'rgb24',
+        '-f', 'rawvideo',
+        'pipe:1'
+    ]);
+}
+
+//ffprobe -v quiet -print_format json -show_streams vids/ns01.mp4
+function getVideoDetails(filename) {
+    return exec(`ffprobe -v quiet -print_format json -show_streams ${filename}`)
+    .then(result => JSON.parse(result.stdout).streams.filter(stream => stream.codec_type === 'video')[0])
+}
+
+
 function namer(layer = 'layer', sample = 'Spl') {
     function* nameGenerator(prefix) {
         let counter = 0;
@@ -52,4 +69,4 @@ function namer(layer = 'layer', sample = 'Spl') {
     return _gen
 }
 
-export {exec, readdir, buildSplits, cleanAll, extractFrames, namer}
+export {exec, readdir, buildSplits, cleanAll, extractFrames, namer, extractFrameStream, getVideoDetails}
