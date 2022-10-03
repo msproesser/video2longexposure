@@ -1,5 +1,5 @@
 import Jimp from "jimp";
-import { workerData, parentPort, isMainThread } from "worker_threads";
+import { workerData, parentPort } from "worker_threads";
 import { incrementalReducer } from "../../helpers/jimp-helpers.mjs";
 
 

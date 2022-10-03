@@ -2,7 +2,7 @@ import {exec, buildSplits, namer} from '../../helpers/utils.mjs'
 import WorkerPool from '../../helpers/worker-pool.mjs'
 export async function pairMerge({fileList, outName}) {
     const [f1, f2, ...unused] = fileList
-    if (!f2) return Promise.resolve({input: [f1], output: f1, unused: [f1]}) 
+    if (!f2) return Promise.resolve({input: [f1], output: f1, unused}) 
     return exec(`composite -blend 50x50 ${f1} ${f2} -alpha Set darkroom/${outName}.png`)
     .then(() => ({
         input: [f1, f2],

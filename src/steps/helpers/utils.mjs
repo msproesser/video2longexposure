@@ -69,4 +69,9 @@ function namer(layer = 'layer', sample = 'Spl') {
     return _gen
 }
 
-export {exec, readdir, buildSplits, cleanAll, extractFrames, namer, extractFrameStream, getVideoDetails}
+async function listFrames() {
+    const list = await readdir('frames');
+    return list.filter(f => f.startsWith('frame')).map(f_1 => `./frames/${f_1}`)
+}
+
+export {exec, readdir, buildSplits, cleanAll, extractFrames, namer, extractFrameStream, getVideoDetails, listFrames}

@@ -1,11 +1,10 @@
-import { workerData, parentPort, isMainThread } from "worker_threads";
+import { workerData, parentPort } from "worker_threads";
 import {pairMerge} from './pair-merge-strategy.mjs'
 
 // You can do any heavy stuff here, in a synchronous way
 // without blocking the "main thread"
 parentPort.on("message", message => {
   if (message === "exit") {
-    parentPort.postMessage("sold!");
     parentPort.close();
   } else {
       pairMerge(message.payload)
